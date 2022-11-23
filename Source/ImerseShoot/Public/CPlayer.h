@@ -26,4 +26,39 @@ public:
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
+	void Horizontal(float value);
+	void Vertical(float value);
+	void Fire();
+
+public:
+	// 사용자의 입력에따라 이동시키고 싶다.
+	// 필요속성 : 이동속도, 방향
+	UPROPERTY(EditAnywhere, Category="Settings")
+	int32 speed = 500;
+
+	UPROPERTY()
+	FVector direction;
+
+	// 코드에서 컴포넌트 추가하기
+	UPROPERTY(VisibleAnywhere, Category="Components")
+	class UBoxComponent* Collision;
+	// staticmesh component
+	UPROPERTY(VisibleAnywhere, Category = "Components")
+	class UStaticMeshComponent* BodyMesh;
+
+	// 사용자가 발사버튼을 누르면 총알을 쏘고싶다.
+	// 총알공장
+	UPROPERTY(EditDefaultsOnly, Category="Bullet")
+	TSubclassOf<class ACBullet> BulletFactory;
 };
+
+//디테일창
+//Edit
+//Visible
+// - Anywhere 어디서든 수정가능하다. (클래스, 인스터스에서도)
+// - DefaultsOnly BP 에디터
+// - InstanceOnly 인스턴스 상태에서만
+// 
+// Graph 에서 사용
+//BlueprintReadWrite
+//BlueprintReadOnly
