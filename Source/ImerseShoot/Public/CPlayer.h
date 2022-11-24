@@ -50,6 +50,10 @@ public:
 	// 총알공장
 	UPROPERTY(EditDefaultsOnly, Category="Bullet")
 	TSubclassOf<class ACBullet> BulletFactory;
+
+	// 총알 발사 사운드
+	UPROPERTY(EditDefaultsOnly, Category = "Bullet")
+	class USoundBase* BulletSound;
 };
 
 //디테일창

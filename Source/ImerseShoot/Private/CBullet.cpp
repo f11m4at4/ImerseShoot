@@ -15,9 +15,13 @@ ACBullet::ACBullet()
 	// Collision 컴포넌트를 루트로 등록
 	RootComponent = Collision;
 	Collision->SetBoxExtent(FVector(32, 12, 32));
+	Collision->SetCollisionProfileName(TEXT("Bullet"));
+
 	BodyMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("BodyMesh"));
 	BodyMesh->SetupAttachment(Collision);
 	BodyMesh->SetRelativeScale3D(FVector(1, 0.25f, 0.7f));
+	BodyMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+
 	// BodyMesh StaticMesh 데이터 할당
 	ConstructorHelpers::FObjectFinder<UStaticMesh> TempMesh(TEXT("StaticMesh'/Engine/BasicShapes/Cube.Cube'"));
 

@@ -5,23 +5,28 @@
 #include "ImerseShoot.h"
 #include <Components/BoxComponent.h>
 #include "CBullet.h"
+#include <Kismet/GameplayStatics.h>
 
 // Sets default values
 ACPlayer::ACPlayer()
 {
  	// Set this pawn to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
-	
+
 	// 컴포넌트 등록
 	Collision = CreateDefaultSubobject<UBoxComponent>(TEXT("Collision"));
 	// Collision 컴포넌트를 루트로 등록
 	RootComponent = Collision;
 	Collision->SetBoxExtent(FVector(50));
+	Collision->SetCollisionProfileName(TEXT("Player"));
+
 	BodyMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("BodyMesh"));
 	BodyMesh->SetupAttachment(Collision);
-
+	BodyMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	BodyMesh->SetRelativeRotation(FRotator(0, 90, 90));
+	BodyMesh->SetRelativeScale3D(FVector(6));
 	// BodyMesh StaticMesh 데이터 할당
-	ConstructorHelpers::FObjectFinder<UStaticMesh> TempMesh(TEXT("StaticMesh'/Engine/BasicShapes/Cube.Cube'"));
+	ConstructorHelpers::FObjectFinder<UStaticMesh> TempMesh(TEXT("StaticMesh'/Game/SpaceShip/Spaceship_ARA.Spaceship_ARA'"));
 
 	// 로드완료되면
 	if(TempMesh.Succeeded())
@@ -30,14 +35,14 @@ ACPlayer::ACPlayer()
 		BodyMesh->SetStaticMesh(TempMesh.Object);
 	}
 
-	ConstructorHelpers::FObjectFinder<UMaterialInterface> TempMat(TEXT("Material'/Engine/BasicShapes/BasicShapeMaterial.BasicShapeMaterial'"));
-
-	// 로드완료되면
-	if (TempMat.Succeeded())
-	{
-		// BodyMesh 에 할당
-		BodyMesh->SetMaterial(0, TempMat.Object);
-	}
+	//ConstructorHelpers::FObjectFinder<UMaterialInterface> TempMat(TEXT("Material'/Engine/BasicShapes/BasicShapeMaterial.BasicShapeMaterial'"));
+	//
+	//// 로드완료되면
+	//if (TempMat.Succeeded())
+	//{
+	//	// BodyMesh 에 할당
+	//	BodyMesh->SetMaterial(0, TempMat.Object);
+	//}
 }
 
 // Called when the game starts or when spawned
@@ -95,6 +100,9 @@ void ACPlayer::Fire()
 	FActorSpawnParameters Params;
 	Params.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 
-	GetWorld()->SpawnActor<ACBullet>(BulletFactory, Location, FRotator(), Params);
+	GetWorld()->SpawnActor<ACBullet>(BulletFactory, Location, FRotator(0,0,0), Params);
+
+	// 총알 발사 사운드 재생
+	UGameplayStatics::PlaySound2D(GetWorld(), BulletSound);
 }
 
