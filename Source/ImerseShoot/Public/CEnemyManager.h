@@ -29,7 +29,7 @@ private:
 	// 필요속성 : 적공장, 생성시간, 경과시간
 	UPROPERTY(EditDefaultsOnly, Category="Settings")
 	TSubclassOf<class ACEnemy> EnemyFactory;
-	UPROPERTY(EditAnywhere, Category= "Settings")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category= "Settings", meta=(AllowPrivateAccess = true))
 	float CreateTime = 2;
 
 	float CurrnetTime = 0;

@@ -40,13 +40,14 @@ ACBullet::ACBullet()
 		// BodyMesh 에 할당
 		BodyMesh->SetMaterial(0, TempMat.Object);
 	}
+	//InitialLifeSpan = 2;
 }
 
 // Called when the game starts or when spawned
 void ACBullet::BeginPlay()
 {
 	Super::BeginPlay();
-	
+
 }
 
 // Called every frame
@@ -54,8 +55,28 @@ void ACBullet::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	if (IsActive == false)
+	{
+		return;
+	}
 	// P = P0 + vt
 	FVector P = GetActorLocation() + FVector::UpVector * speed * DeltaTime;
 	SetActorLocation(P);
+}
+
+void ACBullet::SetActive(bool bActivate)
+{
+	IsActive = bActivate;
+	// 1. 안보이게 처리
+	BodyMesh->SetVisibility(IsActive);
+	// 2. 충돌 설정
+	if (IsActive)
+	{
+		Collision->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+	}
+	else
+	{
+		Collision->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	}
 }
 

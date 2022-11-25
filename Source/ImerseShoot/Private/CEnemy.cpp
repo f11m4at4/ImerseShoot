@@ -5,7 +5,9 @@
 #include <Components/BoxComponent.h>
 #include "../Public/CPlayer.h"
 #include "Kismet/GameplayStatics.h"
-
+#include "Kismet/KismetMathLibrary.h"
+#include "CBullet.h"
+#include "DestroyZone.h"
 // Sets default values
 ACEnemy::ACEnemy()
 {
@@ -67,9 +69,9 @@ void ACEnemy::BeginPlay()
 		Direction = FVector::DownVector;
 	}
 
-	//// 타겟방향으로 액터회전시키기
-	//FVector Rot = GetActorQuat() * Direction;
-	//SetActorRotation(Rot.Rotation());
+	// 타겟방향으로 액터회전시키기
+	FRotator Rot = FRotationMatrix::MakeFromXY(Direction, GetActorRightVector()).Rotator();
+	SetActorRotation(Rot);
 }
 
 // 타겟을 따라서 이동하고 싶다.
@@ -78,20 +80,44 @@ void ACEnemy::BeginPlay()
 void ACEnemy::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
 	
 	// P = P0 + vt
 	FVector P = GetActorLocation() + Direction * speed * DeltaTime;
 	SetActorLocation(P);
+
 }
 
 void ACEnemy::OnComponentBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
+	// 부딪힌 녀석이 DestoryZone 이면 아무처리도 하지 않는다.
+	if (OtherActor->IsA(ADestroyZone::StaticClass()))
+	{
+		return;
+	}
+
 	// 폭발효과 발생시키기
 	UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), ExplosionFactory, GetActorLocation());
 
-	// 부딪힌 녀석을 없애고
-	OtherActor->Destroy();
+	// 부딪힌 녀석이 총알이면
+	if (OtherActor->IsA(ACBullet::StaticClass()))
+	{
+		// 탄창에 넣고 싶다.
+		auto Bullet = Cast<ACBullet>(OtherActor);
+		Bullet->SetActive(false);
+		ACPlayer::BulletPool.Add(Bullet);
+		// 1. Player 가 있어야 한다.
+		/*auto Player = Cast<ACPlayer>(UGameplayStatics::GetActorOfClass(GetWorld(), ACPlayer::StaticClass()));
+		if (Player != nullptr)
+		{
+			Player->BulletPool.Add(Bullet);
+		}*/
+	}
+	else
+	{
+		// 부딪힌 녀석을 없애고
+		OtherActor->Destroy();
+	}
+
 	// 나도 없어지자.
 	Destroy();
 }

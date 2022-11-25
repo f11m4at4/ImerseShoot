@@ -4,16 +4,16 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
-#include "CBullet.generated.h"
+#include "DestroyZone.generated.h"
 
 UCLASS()
-class IMERSESHOOT_API ACBullet : public AActor
+class IMERSESHOOT_API ADestroyZone : public AActor
 {
 	GENERATED_BODY()
 	
 public:	
 	// Sets default values for this actor's properties
-	ACBullet();
+	ADestroyZone();
 
 protected:
 	// Called when the game starts or when spawned
@@ -23,16 +23,10 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
-	// 위로 계속 올라가고 싶다.
-	UPROPERTY(EditDefaultsOnly, Category="Settings")
-	float speed = 1000;
-
 	UPROPERTY(VisibleAnywhere, Category = "Components")
 	class UBoxComponent* Collision;
-	// staticmesh component
-	UPROPERTY(VisibleAnywhere, Category = "Components")
-	class UStaticMeshComponent* BodyMesh;
 
-	bool IsActive = false;
-	void SetActive(bool bActivate);
+public:
+	UFUNCTION()
+	void OnComponentBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 };
